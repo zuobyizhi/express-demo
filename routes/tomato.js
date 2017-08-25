@@ -6,5 +6,6 @@ var tomato = require('../controllers/tomato');
 router.get('/list', tomato.list);
 router.get('/add', tomato.add);
 router.get('/delete', tomato.deleteOne);
+router.get('/update', tomato.update);
 
 module.exports = router;
