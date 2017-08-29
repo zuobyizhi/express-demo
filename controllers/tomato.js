@@ -2,15 +2,38 @@ module.exports.list = list;
 module.exports.add = add;
 module.exports.deleteOne = deleteOne;
 module.exports.update = update;
+module.exports.getOne = getOne;
 
-function test (req, res, next) {
-  // res.json(JSON.stringify({"code": 200, "msg": "111"}));
-  console.log(pool)
-  res.json({"code": 200, "msg": "123"});
+function getOne (req, res, next) {
+  let id = Number(req.query.id || 0);
+  if (id <= 0 && isNaN(id)) {
+    res.json({"code": 500, "msg": "uid不正确"});
+  }
+  let sql = 'select * from item where id = ' + id + ' limit 1; ';
+
+  pool.getConnection(function (err, conn) {
+    if (err) {
+      console.log('POOL ==> ' + err)
+      conn.release()
+      res.json({"code": 500, "msg": err})
+      return
+    }
+
+    conn.query(sql, function(err, rows) {
+      if (err) {
+        console.log(err)
+        res.json({"code": 500, "msg": err})
+        return
+      }
+      res.json({"code": 200, "msg": rows})
+      conn.release()
+    })
+  })
 }
 
 function list (req, res, next) {
-  let uid = Number(req.query.uid || 0);
+  // let uid = Number(req.query.uid || 0);
+  let uid = Number(req.query.uid || req.cookies.uid || 0);
   let key = req.query.key || '';
   let type = Number(req.query.type || 0);
   let start = Number(req.query.start || 0);
@@ -64,7 +87,8 @@ function list (req, res, next) {
 }
 
 function add (req, res, next) {
-  let uid = Number(req.query.uid || 0);
+  // let uid = Number(req.query.uid || 0);
+  let uid = Number(req.query.uid || req.cookies.uid || 0);
   let content = req.query.content || '';
   let type = Number(req.query.type || 0);
   let sql = "insert into item values (null, '"

@@ -7,5 +7,6 @@ router.get('/list', tomato.list);
 router.get('/add', tomato.add);
 router.get('/delete', tomato.deleteOne);
 router.get('/update', tomato.update);
+router.get('/getone', tomato.getOne);
 
 module.exports = router;

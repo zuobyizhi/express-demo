@@ -2,6 +2,8 @@ let crypto = require('crypto')
 
 module.exports.login = login;
 module.exports.register = register;
+module.exports.logout = logout;
+module.exports.chkLogin = chkLogin;
 
 function md5(tx) {
   const obj = crypto.createHash('md5');
@@ -36,11 +38,25 @@ function login (req, res, next) {
         conn.release()
         return
       }
-      res.cookie('uid', rows[0].uid, {expires: new Date(Date.now() + 7*24*60*1000), httpOnly: false})
+      res.cookie('uid', rows[0].uid, {expires: new Date(Date.now() + 7*24*60*60*1000), httpOnly: false})
       res.json({"code": 200, "msg": rows})
       conn.release()
     })
   })
+}
+
+function logout (req, res, next) {
+  res.cookie('uid', '', {expires: new Date(Date.now()), httpOnly: false});
+  res.json({"code": 200, "msg": ""});
+}
+
+function chkLogin (req, res, next) {
+  let uid = Number(req.cookies.uid || 0);
+  if (uid > 0) {
+    res.json({"code": 200, "msg": ""});
+  } else {
+    res.json({"code": 500, "msg": ""});
+  }
 }
 
 function register (req, res, next) {
