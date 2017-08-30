@@ -38,6 +38,8 @@ function list (req, res, next) {
   let type = Number(req.query.type || 0);
   let start = Number(req.query.start || 0);
   let count = Number(req.query.count || 10);
+  let startTime = Number(req.query.starttime || 0);
+  let endTime = Number(req.query.endtime || 0);
   if (uid <= 0 && isNaN(uid)) {
     res.json({"code": 500, "msg": "uid不正确"});
   }
@@ -46,6 +48,12 @@ function list (req, res, next) {
   }
   if (count <= 0 && isNaN(count)) {
     res.json({"code": 500, "msg": "count不正确"});
+  }
+  if (startTime < 0 && isNaN(startTime)) {
+    res.json({"code": 500, "msg": "startTime不正确"});
+  }
+  if (endTime < 0 && isNaN(endTime)) {
+    res.json({"code": 500, "msg": "endTime不正确"});
   }
   let sql = 'select * from item where uid = ' + uid;
   let sqlCount = 'select count(*) as count from item where uid = ' + uid;
@@ -56,6 +64,10 @@ function list (req, res, next) {
   if (key !== '') {
     sql += ' and content like "%' + key + '%" '
     sqlCount += ' and content like "%' + key + '%" '
+  }
+  if (startTime > 0 && endTime > 0 && startTime < endTime) {
+    sql += ' and createtime > ' + startTime + ' and createtime < ' + endTime + ' '
+    sqlCount += ' and createtime > ' + startTime + ' and createtime < ' + endTime + ' '
   }
   sql += ' order by id desc limit ' + start + ', ' + count;
 
